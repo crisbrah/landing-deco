@@ -1,7 +1,5 @@
 const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 module.exports = async (req, res) => {
     // 1. Configuracion de CORS (importante para evitar bloqueos del navegador web)
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -32,6 +30,11 @@ module.exports = async (req, res) => {
 
     // 5. Envío del Correo usando el API de Resend
     try {
+        if (!process.env.RESEND_API_KEY) {
+            return res.status(500).json({ error: 'La clave de API de Resend (RESEND_API_KEY) no está configurada en el servidor de Vercel.' });
+        }
+
+        const resend = new Resend(process.env.RESEND_API_KEY);
         const data = await resend.emails.send({
             from: 'onboarding@resend.dev', // Remitente (temporal de prueba que ofrece Resend)
             to: 'crisbrah@gmail.com',      // Destinatario: el correo directo que solicitaste
